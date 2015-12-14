@@ -1,0 +1,83 @@
+<head>
+  <title>ArcGIS Draw Collab</title>
+  <!-- CSS SHOULD NOT BE HERE, TEMPORARY-->
+  <style>
+    #menu {
+      top: 20px;
+      color: #444;
+      height: auto;
+      font-family: arial;
+      right: 20px;
+      margin: 5px;
+      padding: 10px;
+      position: absolute;
+      width: 280px;
+      z-index: 40;
+      border: solid 2px #666;
+      border-radius: 4px;
+      background-color: #fff;
+    }
+
+    html,
+    body,
+    #map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    button {
+      display: block;
+    }
+
+    body {
+      background-color: #FFF;
+      overflow: hidden;
+      font-family: "Trebuchet MS";
+    }
+
+    .hiddendiv{
+      display: none;
+    }
+
+    .transparent{
+      background-color:rgba(0,0,0,0) !important;
+       border:none !important;
+    }
+    #currentDrawingNameDiv{
+      display: block;
+    }
+    #NameInput{
+      font-size: 1.5em;
+    }
+    #submit_error{
+      display: none;
+      margin-bottom: 0px;
+    }
+  </style>
+</head>
+
+<body>
+</body>
+
+<template name="ArcGISDraw">
+    <div id="menu">
+      <h2> ArcDraw </h2>
+      <div id="currentDrawingNameDiv">
+        <h4>Your Current Session ID:</h4>
+        <div class="row">
+        <div  class="col-xs-6">
+          <input class="form-control transparent" id="NameInput" type = "text" value ={{currentDrawingName}}>
+        </div>
+      </div>
+        <h5>Replace with your friend's Session ID to start a collab session! (Enter to load)</h5>
+      </div>
+      <button class="btn btn-success" id="StartButton">Start Drawing!</button>
+      <div class="hiddendiv">{{drawing}}</div>
+      <br/>
+      <br/>
+      <div class="alert alert-danger" role="alert" id="submit_error">Invalid Session ID</div>
+    </div>
+    <div id="map">
+    </div>
+</template>
