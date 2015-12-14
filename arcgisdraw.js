@@ -178,6 +178,14 @@ if (Meteor.isClient) {
             RGB = getRGBValue();
             evt.geometry.RGB = RGB;
 
+            symbol = new SimpleLineSymbol(
+              SimpleLineSymbol.STYLE_SOLID,
+              new Color([evt.geometry.RGB[0], evt.geometry.RGB[1], evt.geometry.RGB[2], 0.85]),
+              6
+            );
+            var graphic = new Graphic(evt.geometry, symbol);
+            map.graphics.add(graphic);
+
             Drawings.update({
               _id: getcurrentDrawingId()
             }, {
@@ -237,7 +245,6 @@ if (Meteor.isClient) {
           connect.subscribe("updateGraphics", function(fields) {
             var geometries = fields.geometries;
             drawAllGeometries(geometries);
-
           });
 
           //Does the job of rendering all the lines on the map
