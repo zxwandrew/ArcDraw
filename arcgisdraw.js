@@ -16,9 +16,9 @@ if (Meteor.isClient) {
   Meteor.subscribe("drawings");
 
   //Getters and setters for the name, id, and RGB
-  updatecurrentDrawing = function(drawing) {
-    setcurrentDrawingName(drawing.name);
-    setcurrentDrawingId(drawing._id);
+  updatecurrentDrawing = function(drawingid, drawingname) {
+    setcurrentDrawingName(drawingname);
+    setcurrentDrawingId(drawingid);
   }
 
   setcurrentDrawingName = function(value) {
@@ -168,8 +168,11 @@ if (Meteor.isClient) {
                 drawingState = false;
               }
             });
-            newdrawing._id = Drawings.insert(newdrawing);
-            updatecurrentDrawing(newdrawing);
+
+            //Call meteor method addDrawing
+            Meteor.call("addDrawing", newdrawing, function(error, result){
+              updatecurrentDrawing(result, newdrawing.name);
+            });
           };
 
           //When a polyline is finished, update the current drawing's geometry
@@ -186,13 +189,9 @@ if (Meteor.isClient) {
             var graphic = new Graphic(evt.geometry, symbol);
             map.graphics.add(graphic);
 
-            Drawings.update({
-              _id: getcurrentDrawingId()
-            }, {
-              $push: {
-                geometries: evt.geometry
-              }
-            }, false);
+            //Call meteor method updateDrawing
+            Meteor.call("updateDrawing",getcurrentDrawingId(), evt.geometry);
+
           };
 
           //Listen for change in the NameInput, either enter or blur
@@ -218,7 +217,7 @@ if (Meteor.isClient) {
               //remove all errors, update to new drawing
               query("#submit_error").style("display","none");
 
-              updatecurrentDrawing(updatedrawing);
+              updatecurrentDrawing(updatedrawing._id, updatedrawing.name);
               initDrawing(updatedrawing.geometries);
             }else{
               //throw error, revert back to original drawing
@@ -226,11 +225,10 @@ if (Meteor.isClient) {
               dom.byId("submit_error").innerHTML=newname+" is not a valid session id";
               query("#submit_error").style("display","block");
               dom.byId("NameInput").value = currentname;
-
               updatedrawing = Drawings.findOne({
                 name: currentname
               });
-              updatecurrentDrawing(updatedrawing);
+              updatecurrentDrawing(updatedrawing._id, updatedrawing.name);
               initDrawing(updatedrawing.geometries);
             }
           }
@@ -276,6 +274,18 @@ if (Meteor.isClient) {
 }//END OF CLIENT
 
 Meteor.methods({
+  addDrawing: function(newdrawing){
+    return Drawings.insert(newdrawing)
+  },
+  updateDrawing: function(id, geometry){
+    Drawings.update({
+      _id: id
+    }, {
+      $push: {
+        geometries: geometry
+      }
+    }, false);
+  }
 });
 
 if (Meteor.isServer) {
